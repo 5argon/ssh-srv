@@ -1,0 +1,18 @@
+#!/bin/bash
+SRVURL=$1
+
+SPLITUSERNAME=(${SRVURL//@/ })
+#echo ${SPLITUSERNAME[0]}
+#echo ${SPLITUSERNAME[1]}
+if [ -z ${SPLITUSERNAME[1]} ]
+    then
+    SPLITUSERNAME[1]=${SPLITUSERNAME[0]}
+    SPLITUSERNAME[0]=$USER
+fi
+
+#outer parentheses uses spaces for an array delimiter
+SRVRESOLVE=($(nslookup -type=SRV ${SPLITUSERNAME[1]} | grep -Eo "service.*" | grep -Eo "[0-9]*[ ][^ ]*$"))
+#echo ${SRVRESOLVE[0]}
+#echo ${SRVRESOLVE[1]}
+
+ssh ${SPLITUSERNAME[0]}@${SRVRESOLVE[1]} -p ${SRVRESOLVE[0]}
